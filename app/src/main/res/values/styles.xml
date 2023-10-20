@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize the overflow button icon -->
+        <item name="actionOverflowButtonStyle">@style/MyOverflowButton</item>
+        <item name="android:src">@drawable/menu_icon</item>
+<!--        <item name="android:colorBackground">@color/purple</item>-->
+    </style>
+
+    <style name="MyOverflowButton" parent="Widget.AppCompat.ActionButton">
+        <item name="android:src">@drawable/menu_icon</item>
+    </style>
+</resources>
