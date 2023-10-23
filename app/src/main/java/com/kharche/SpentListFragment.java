@@ -3,16 +3,20 @@ package com.kharche;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
-import com.kharche.dao.CategoryDao;
+import com.kharche.adapters.CategoryAdapter;
+import com.kharche.adapters.SpentAdapter;
 import com.kharche.dao.SpentDao;
-import com.kharche.model.Category;
 import com.kharche.model.Spent;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -30,19 +34,33 @@ public class SpentListFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_spent_list, container, false);
-        getAllSpents();
+
+        RecyclerView spentListContainer = (RecyclerView) view.findViewById(R.id.spent_list_container);
+        SpentAdapter spentAdapter = new SpentAdapter(getAllSpent());
+        spentListContainer.setAdapter(spentAdapter);
+        spentListContainer.setLayoutManager(new LinearLayoutManager(requireContext()));
 
         return view;
     }
 
-    private void getAllSpents() {
+    private List<Spent> getAllSpent() {
+        List<Spent> setSpentList  = new ArrayList<>();
+
         SpentDao spentDao = new SpentDao(requireContext());
         List<Spent> spentList = spentDao.getAllSpents();
         for (Spent spent : spentList) {
-            System.out.println("all  spent 1 " + spent.toString() + spent.getCategoryId());
+            Spent setSpent = new Spent();
+
+            setSpent.setAmount(spent.getAmount());
+            setSpent.setDescription(spent.getDescription());
+            setSpent.setCreatedAt(spent.getCreatedAt());
+            setSpent.setId(spent.getId());
             if(spent.getCategoryId() != null){
-                System.out.println("all  spent b " + spent.getCategoryId().toString());
+                setSpent.setCategoryId(spent.getCategoryId());
             }
+
+            setSpentList.add(setSpent);
         }
+        return setSpentList;
     }
 }

@@ -1,6 +1,7 @@
 package com.kharche.db;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Environment;
@@ -23,6 +24,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + TableName.CATEGORY + " (id INTEGER PRIMARY KEY AUTOINCREMENT, category CHAR(50),created_at default current_timestamp, updated default current_timestamp)");
         db.execSQL("CREATE TABLE " + TableName.SPENT_AMOUNT + " (id INTEGER PRIMARY KEY AUTOINCREMENT, category_id INTEGER, amount INTEGER, description TEXT, created_at default current_timestamp, updated default current_timestamp)");
+
+
     }
 
     @Override

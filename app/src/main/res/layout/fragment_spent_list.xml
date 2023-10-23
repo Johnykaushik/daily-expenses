@@ -6,11 +6,26 @@
     tools:context=".SpentListFragment"
     android:layout_marginTop="?attr/actionBarSize"
     >
+<!--    <TextView-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="@string/add_category"-->
+<!--        android:id="@+id/sample_cat"-->
+<!--        />-->
+<!--    <ScrollView-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="0dp"-->
+<!--        android:layout_weight="1">-->
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="spent list" />
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/spent_list_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:paddingTop="10dp"
+            android:background="#ececec"
+            />
+<!--    </ScrollView>-->
 
 </FrameLayout>

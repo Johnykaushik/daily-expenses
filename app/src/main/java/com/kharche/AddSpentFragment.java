@@ -137,16 +137,16 @@ public class AddSpentFragment extends Fragment {
     }
 
     private void moveToList(){
-        try {
-            Thread.sleep(500);
-            FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-            FragmentTransaction transaction = fragmentManager.beginTransaction();
-            SpentListFragment spentListFragment = new SpentListFragment();
-            transaction.replace(R.id.fragment_container, spentListFragment);
-            transaction.addToBackStack(null);
-            transaction.commit();
-        } catch (InterruptedException e) {
-            // Handle the exception if needed
-        }
+//        try {
+//            Thread.sleep(500);
+//            FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+//            FragmentTransaction transaction = fragmentManager.beginTransaction();
+//            SpentListFragment spentListFragment = new SpentListFragment();
+//            transaction.replace(R.id.fragment_container, spentListFragment);
+//            transaction.addToBackStack(null);
+//            transaction.commit();
+//        } catch (InterruptedException e) {
+//            // Handle the exception if needed
+//        }
     }
 }

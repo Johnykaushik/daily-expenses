@@ -2,10 +2,23 @@ package com.kharche;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ListView;
+import android.widget.SimpleAdapter;
+
+import com.kharche.adapters.CategoryAdapter;
+import com.kharche.dao.CategoryDao;
+import com.kharche.model.Category;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
 public class MainActivity extends AppCompatActivity {
 
     @Override
@@ -17,8 +30,26 @@ public class MainActivity extends AppCompatActivity {
         getSupportActionBar().setTitle(R.string.add_spent);
 
         if (savedInstanceState == null) {
-            replaceAndRemoveFragments(new AddSpentFragment());
+            replaceAndRemoveFragments(new SpentListFragment());
         }
+    }
+
+    private List<Category> getCategories() {
+        List<Category> cateList = new ArrayList<>();
+
+        CategoryDao categoryDao = new CategoryDao(this);
+        List<Category> categories = categoryDao.getAllCategories();
+        for (Category category : categories) {
+            int categoryId = category.getId();
+            String categoryName = category.getCategoryName();
+
+            Category setCat = new Category();
+//            setCat.setId(categoryId);
+            setCat.setCategoryName(categoryName);
+
+            cateList.add(setCat);
+        }
+        return cateList;
     }
 
     @Override
@@ -48,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
 
         } else if (itemId == R.id.category_list) {
             getSupportActionBar().setTitle(R.string.category_list);
-            replaceAndRemoveFragments(new CategoryItemListFragment());
+            replaceAndRemoveFragments(new CategoryListFragment());
         } else {
             getSupportActionBar().setTitle(R.string.dashboard);
             replaceAndRemoveFragments(new DashboardFragment());

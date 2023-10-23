@@ -65,16 +65,16 @@ public class AddCategoryFragment extends Fragment {
     }
 
     private void moveToList() {
-        try {
-            Thread.sleep(500);
-            FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-            FragmentTransaction transaction = fragmentManager.beginTransaction();
-            CategoryItemListFragment categoryListFragment = new CategoryItemListFragment();
-            transaction.replace(R.id.fragment_container, categoryListFragment);
-            transaction.addToBackStack(null);
-            transaction.commit();
-        } catch (InterruptedException e) {
-            // Handle the exception if needed
-        }
+//        try {
+//            Thread.sleep(500);
+//            FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+//            FragmentTransaction transaction = fragmentManager.beginTransaction();
+//            CategoryItemListFragment categoryListFragment = new CategoryItemListFragment();
+//            transaction.replace(R.id.fragment_container, categoryListFragment);
+//            transaction.addToBackStack(null);
+//            transaction.commit();
+//        } catch (InterruptedException e) {
+//            // Handle the exception if needed
+//        }
     }
 }
