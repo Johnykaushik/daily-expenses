@@ -1,12 +1,16 @@
 package com.kharche.model;
 
+import java.util.Date;
+
 public class Spent {
 
     public int id;
-    public long amount;
+    public int amount;
     public String description;
 
     public Category categoryId;
+
+    public String createdAt;
 
     public int getId() {
         return id;
@@ -16,11 +20,11 @@ public class Spent {
         this.id = id;
     }
 
-    public long getAmount() {
+    public int getAmount() {
         return amount;
     }
 
-    public void setAmount(long amount) {
+    public void setAmount(int amount) {
         this.amount = amount;
     }
 
@@ -32,6 +36,23 @@ public class Spent {
         this.description = description;
     }
 
+    public Category getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(Category categoryId) {
+        this.categoryId = categoryId;
+    }
+
+
+    public String getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(String createdAt) {
+        this.createdAt = createdAt;
+    }
+
     @Override
     public String toString() {
         return "Spent{" +
@@ -39,14 +60,7 @@ public class Spent {
                 ", amount=" + amount +
                 ", description='" + description + '\'' +
                 ", categoryId=" + categoryId +
+                ", createdAt='" + createdAt + '\'' +
                 '}';
-    }
-
-    public Category getCategoryId() {
-        return categoryId;
-    }
-
-    public void setCategoryId(Category categoryId) {
-        this.categoryId = categoryId;
     }
 }

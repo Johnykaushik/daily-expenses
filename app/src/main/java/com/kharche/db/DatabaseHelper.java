@@ -1,6 +1,7 @@
 package com.kharche.db;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Environment;
@@ -12,7 +13,7 @@ import java.io.IOException;
 import java.nio.channels.FileChannel;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
-    private static final String DATABASE_NAME = "kharchev1.db";
+    private static final String DATABASE_NAME = TableName.DATABASE_NAME;
     private static final int DATABASE_VERSION = 1;
 
     public DatabaseHelper(Context context) {

@@ -5,13 +5,36 @@
     android:layout_height="match_parent"
     android:layout_marginTop="?attr/actionBarSize"
     android:orientation="vertical"
-    tools:context=".CategoryListFragment">
+    tools:context=".CategoryListFragment"
+    android:background="#ececec"
+    >
 
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="Category list" />
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingLeft="10dp"
+        android:layout_marginTop="@dimen/common_margin_top"
+        >
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Used on Top"
+            android:id="@+id/used_on_top_sort" />
 
+        <Switch
+            android:id="@+id/sort_max_category"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            />
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/category_list_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="10dp"
+            android:paddingTop="10dp"
+            android:paddingRight="10dp" />
 
 </LinearLayout>
-

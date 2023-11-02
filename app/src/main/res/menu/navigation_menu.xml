@@ -23,4 +23,8 @@
         android:id="@+id/category_list"
         android:title="@string/category_list"
         />
+    <item
+        android:id="@+id/export_db"
+        android:title="@string/export_db"
+        />
 </menu>
