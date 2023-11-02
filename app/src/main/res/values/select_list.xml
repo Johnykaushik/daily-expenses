@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="price_category">
+        <item>Select Category</item>
+    </string-array>
+    <string-array name="date_filter_type">
+        <item>Select Date Type</item>
+        <item>Today</item>
+        <item>Yesterday</item>
+        <item>Current Week</item>
+        <item>Last Week</item>
+        <item>Current Month</item>
+        <item>Last Month</item>
+        <item>Custom Date</item>
+    </string-array>
+    <string-array name="dashboard_date_type">
+        <item>Day</item>
+        <item>Week</item>
+        <item>Month</item>
+        <item>Year</item>
+    </string-array>
+</resources>

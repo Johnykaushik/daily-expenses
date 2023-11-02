@@ -3,17 +3,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:layout_marginTop="?attr/actionBarSize"
+    android:orientation="vertical"
+    android:paddingLeft="@dimen/common_margin_left"
+    android:paddingRight="@dimen/common_margin_right"
     tools:context=".AddSpentFragment">
 
     <EditText
         android:id="@+id/spent_amount"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="20dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginRight="20dp"
+        android:layout_marginTop="@dimen/common_margin_top"
+        android:layout_marginRight="@dimen/common_margin_right"
         android:hint="Enter Spent Amount"
         android:inputType="numberDecimal" />
 
@@ -21,19 +22,24 @@
         android:id="@+id/spent_on"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="20dp"
-        android:layout_marginTop="30dp"
-        android:layout_marginRight="20dp"
+        android:layout_marginTop="@dimen/common_margin_top"
         android:hint="Spent Amount On"
         android:inputType="text" />
+
+    <EditText
+        android:id="@+id/spent_date"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/common_margin_top"
+        android:clickable="true"
+        android:focusable="false"
+        android:hint="Date" />
 
     <Spinner
         android:id="@+id/price_category"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="20dp"
-        android:layout_marginTop="30dp"
-        android:layout_marginRight="20dp"
+        android:layout_marginTop="@dimen/common_margin_top"
         android:entries="@array/price_category"
         android:prompt="@string/price_category_title" />
 
@@ -41,8 +47,8 @@
         android:id="@+id/submit_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="20dp"
-        android:layout_marginTop="30dp"
+        android:layout_gravity="right"
+        android:layout_marginTop="@dimen/common_margin_top"
         android:text="Add Spent"
         android:textColor="@color/white" />
 </LinearLayout>
