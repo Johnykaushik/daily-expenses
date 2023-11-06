@@ -24,15 +24,19 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.Switch;
+import android.widget.TextView;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.kharche.adapters.SpentAdapter;
 import com.kharche.dao.CategoryDao;
 import com.kharche.dao.SpentDao;
 import com.kharche.helpers.DatePickerHelper;
 import com.kharche.interfaces.IDatePicker;
 import com.kharche.interfaces.IToolbarHeadingTitle;
+import com.kharche.interfaces.OnItemClickListener;
 import com.kharche.model.Category;
 import com.kharche.model.Spent;
+import com.kharche.utils.ConfirmPop;
 import com.kharche.utils.DateFilterType;
 
 import java.util.ArrayList;
@@ -40,12 +44,14 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * A simple {@link Fragment} subclass.
  * create an instance of this fragment.
  */
-public class SpentListFragment extends Fragment implements IDatePicker {
+public class SpentListFragment extends Fragment implements IDatePicker, OnItemClickListener {
     private Spinner category_base;
     private ArrayAdapter<String> dynamic_category_list;
     private HashMap<String, Integer> category_list;
@@ -61,7 +67,10 @@ public class SpentListFragment extends Fragment implements IDatePicker {
     private boolean sortByPrice;
 
     DatePickerHelper datePickerHelper;
-
+    List<Spent> spentDynamicList;
+    SpentAdapter spentAdapter;
+    View pageView;
+    TextView data_not_available;
 
     public SpentListFragment(IToolbarHeadingTitle iToolbarHeadingTitle) {
         // Required empty public constructor
@@ -72,14 +81,21 @@ public class SpentListFragment extends Fragment implements IDatePicker {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_spent_list, container, false);
+        pageView = view;
         iToolbarHeadingTitle.setToolBarTitle(R.string.spent_list);
-        datePickerHelper = new DatePickerHelper(requireContext(),this);
+        datePickerHelper = new DatePickerHelper(requireContext(), this);
+
+        // hide no data available label initially
+
+        data_not_available = view.findViewById(R.id.data_not_available);
+        data_not_available.setVisibility(View.GONE);
 
         //  set default date that is current week
         setDefaultDate();
         // initial show all data from db
         RecyclerView spentListContainer = (RecyclerView) view.findViewById(R.id.spent_list_container);
-        SpentAdapter spentAdapter = new SpentAdapter(getAllSpent());
+        spentDynamicList = getAllSpent();
+        spentAdapter = new SpentAdapter(spentDynamicList, this);
         spentListContainer.setAdapter(spentAdapter);
         spentListContainer.setLayoutManager(new LinearLayoutManager(requireContext()));
 
@@ -206,13 +222,13 @@ public class SpentListFragment extends Fragment implements IDatePicker {
         start_date.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                datePickerHelper.showDatePicker(true,startDateUnix);
+                datePickerHelper.showDatePicker(true, startDateUnix);
             }
         });
         end_date.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                datePickerHelper.showDatePicker(false,startDateUnix);
+                datePickerHelper.showDatePicker(false, startDateUnix);
             }
         });
 
@@ -233,7 +249,7 @@ public class SpentListFragment extends Fragment implements IDatePicker {
                 String searchInputData = searchInput.getText().toString();
                 filterMap.put("search", searchInputData);
                 filterMap.put("category_id", "");
-                filterMap.put("sort_price",sortByPrice);
+                filterMap.put("sort_price", sortByPrice);
 
                 if (selectedCategory != null) {
                     if (!selectedCategory.isEmpty()) {
@@ -251,6 +267,7 @@ public class SpentListFragment extends Fragment implements IDatePicker {
         updateSpinnerData();
         return view;
     }
+
 
     private void setDefaultDate() {
         setStartEndTime(DateFilterType.CURRENT_WEEK);
@@ -277,14 +294,21 @@ public class SpentListFragment extends Fragment implements IDatePicker {
             setSpentList.add(setSpent);
         }
 
+        setPageTitle(totalAmount);
+        int visibility = setSpentList.size() == 0 ? View.VISIBLE : View.GONE;
+
+        data_not_available.setVisibility(visibility);
+
+        return setSpentList;
+    }
+
+    private void setPageTitle(int totalAmount) {
         String title = getString(R.string.spent_list);
-        Log.d("TAG", "getAllSpent: " + title);
 
         if (totalAmount > 0) {
             title += " (₹" + totalAmount + ")";
         }
         iToolbarHeadingTitle.setToolBarTitle(title);
-        return setSpentList;
     }
 
     private void updateSpinnerData() {
@@ -310,21 +334,18 @@ public class SpentListFragment extends Fragment implements IDatePicker {
         dynamic_category_list.notifyDataSetChanged();
     }
 
-
-
-
     // show start/end date in view
     public void getPickerDate(boolean isStartDate, int day, int month, int year) {
-        Log.d("Date picker", "getPickerDate:  2" + isStartDate + " year " + year + " month " + month + " day "+ day);
+        Log.d("Date picker", "getPickerDate:  2" + isStartDate + " year " + year + " month " + month + " day " + day);
         try {
             int _month = month;
             _month = _month + 1;
             String monthName = String.valueOf(_month);
             String dayName = String.valueOf(day);
-            if(_month < 10){
+            if (_month < 10) {
                 monthName = "0" + monthName;
             }
-            if(day < 10){
+            if (day < 10) {
                 dayName = "0" + dayName;
             }
             String dateText = dayName + "-" + monthName + "-" + year;
@@ -375,6 +396,55 @@ public class SpentListFragment extends Fragment implements IDatePicker {
                 endDateUnix = utils.getLastWeekEnd();
                 break;
         }
+    }
+
+    //  delete spent
+    @Override
+    public void onItemClick(int itemClicked) {
+        if (spentDynamicList.get(itemClicked) != null) {
+            ConfirmPop confirmPop = new ConfirmPop(requireContext());
+            String label = getResources().getString(R.string.spent_amount_delete_ask);
+            confirmPop.showAlertDialog(label, new ConfirmPop.OnConfirmListener() {
+                @Override
+                public void onYesClicked() {
+                    SpentDao spentDao = new SpentDao(requireContext());
+                    int id = spentDynamicList.get(itemClicked).getId();
+                    int isDeleted = spentDao.deleteOne(id);
+
+                    Log.d("TAG", "onYesClicked: " + isDeleted);
+                    if (isDeleted > 0) {
+                        Snackbar.make(pageView, R.string.spent_amount_deleted_success, Snackbar.LENGTH_LONG).show();
+                        int itemAmount = spentDynamicList.get(itemClicked).getAmount();
+                        spentDynamicList.remove(itemClicked);
+                        spentAdapter.notifyDataSetChanged();
+
+                        CharSequence getTitle = iToolbarHeadingTitle.getToolBarTitle();
+                        int existingAmount = parseTitle(getTitle);
+
+                        int finalAmount = existingAmount - itemAmount;
+                        Log.d("TAG", "onYesClicked: " + getTitle);
+                        setPageTitle(finalAmount);
+                    } else {
+                        Snackbar.make(pageView, R.string.unable_to_process, Snackbar.LENGTH_LONG).show();
+                    }
+                }
+            });
+
+        }
+        Log.d("TAG", "onItemClick:  spents " + itemClicked);
+    }
+
+    private int parseTitle(CharSequence input) {
+        Pattern pattern = Pattern.compile("\\d+"); // Match one or more digits
+        Matcher matcher = pattern.matcher(input);
+
+        if (matcher.find()) {
+            String number = matcher.group();
+            if (number != null) {
+                return Integer.valueOf(number);
+            }
+        }
+        return 0;
     }
 }
 

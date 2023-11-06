@@ -3,6 +3,8 @@ package com.kharche;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,6 +17,7 @@ import com.google.android.material.snackbar.Snackbar;
 import com.kharche.dao.CategoryDao;
 import com.kharche.interfaces.IToolbarHeadingTitle;
 import com.kharche.model.Category;
+import com.kharche.utils.AlertPop;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -51,26 +54,28 @@ public class AddCategoryFragment extends Fragment {
         submitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String categoryName = category.getText().toString();
+                AlertPop alertPop = new AlertPop(requireContext());
+                String categoryName = category.getText().toString().trim();
+
                 if (!categoryName.isEmpty()) {
                     CategoryDao categoryDao = new CategoryDao(requireContext());
                     Category existingCat = categoryDao.getCategory(categoryName);
                     if (existingCat.getId() > 0) {
-                        Snackbar.make(v, R.string.category_exist, Snackbar.LENGTH_LONG).show();
+                        alertPop.showAlertDialog(getResources().getString(R.string.category_exist));
                     } else {
                         Category categoryBase = new Category();
                         categoryBase.setCategoryName(categoryName);
                         Long isAdded = categoryDao.addCategory(categoryBase);
                         if (isAdded > 0) {
                             category.setText("");
-                            Snackbar.make(v, R.string.category_add_success, Snackbar.LENGTH_LONG).show();
+                            alertPop.showAlertDialog(getResources().getString(R.string.category_add_success));
                             moveToList();
                         } else {
-                            Snackbar.make(v, R.string.unable_to_process, Snackbar.LENGTH_LONG).show();
+                            alertPop.showAlertDialog(getResources().getString(R.string.unable_to_process));
                         }
                     }
                 } else {
-                    Snackbar.make(v, R.string.category_required, Snackbar.LENGTH_LONG).show();
+                    alertPop.showAlertDialog(getResources().getString(R.string.category_required));
                 }
 
             }

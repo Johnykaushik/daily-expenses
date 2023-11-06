@@ -1,9 +1,16 @@
 package com.kharche;
 
+import android.content.Intent;
+import android.media.Image;
 import android.os.Bundle;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
+import android.speech.RecognizerIntent;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,7 +19,9 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.kharche.dao.CategoryDao;
@@ -22,9 +31,14 @@ import com.kharche.interfaces.IDatePicker;
 import com.kharche.interfaces.IToolbarHeadingTitle;
 import com.kharche.model.Category;
 import com.kharche.model.Spent;
+import com.kharche.utils.AlertPop;
+import com.kharche.utils.SpeechParser;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -38,6 +52,8 @@ public class AddSpentFragment extends Fragment implements IDatePicker {
     EditText spent_date;
     private IToolbarHeadingTitle iToolbarHeadingTitle;
     DatePickerHelper datePickerHelper;
+    private ActivityResultLauncher<Intent> speechRecognitionLauncher;
+
 
     public AddSpentFragment(IToolbarHeadingTitle iToolbarHeadingTitle) {
         // Required empty public constructor
@@ -49,7 +65,7 @@ public class AddSpentFragment extends Fragment implements IDatePicker {
         View view = inflater.inflate(R.layout.fragment_add_spent, container, false);
         iToolbarHeadingTitle.setToolBarTitle(R.string.add_spent);
 
-        datePickerHelper = new DatePickerHelper(requireContext(),this);
+        datePickerHelper = new DatePickerHelper(requireContext(), this);
 
         category_base = view.findViewById(R.id.price_category);
         dynamic_category_list = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item);
@@ -84,7 +100,17 @@ public class AddSpentFragment extends Fragment implements IDatePicker {
         spent_date.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                datePickerHelper.showDatePicker(true,null);
+                datePickerHelper.showDatePicker(true, null);
+            }
+        });
+
+        // handle microphone click
+        ImageView microphone = view.findViewById(R.id.microphone);
+
+        microphone.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                handleMicClick();
             }
         });
 
@@ -92,6 +118,7 @@ public class AddSpentFragment extends Fragment implements IDatePicker {
         submit_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                AlertPop alertPop = new AlertPop(requireContext());
                 try {
                     String price_input = spent_amount.getText().toString();
                     Integer price = 0;
@@ -105,16 +132,16 @@ public class AddSpentFragment extends Fragment implements IDatePicker {
 
                     String spent_title = spent_on.getText().toString();
                     if (price == 0 || spent_title.isEmpty()) {
-                        Snackbar.make(v, R.string.spent_amount_and_spent_on, Snackbar.LENGTH_LONG).show();
+                        alertPop.showAlertDialog(getResources().getString(R.string.spent_amount_and_spent_on));
                     } else {
                         Spent spent = new Spent();
                         spent.setAmount(price);
                         spent.setDescription(spent_title);
 
                         String date = spent_date.getText().toString();
-                        if(date != null && !date.isEmpty()){
+                        if (date != null && !date.isEmpty()) {
                             String[] dateSpl = date.split("-");
-                            if(dateSpl.length == 3){
+                            if (dateSpl.length == 3) {
                                 spent.setCreatedAt(dateSpl[2] + "-" + dateSpl[1] + "-" + dateSpl[0] + " 00:00:00");
                             }
                         }
@@ -132,10 +159,10 @@ public class AddSpentFragment extends Fragment implements IDatePicker {
                         if (isAdded > 0) {
                             spent_amount.setText("");
                             spent_on.setText("");
-                            Snackbar.make(v, R.string.spent_amount_add_success, Snackbar.LENGTH_LONG).show();
+                            alertPop.showAlertDialog(getResources().getString(R.string.spent_amount_add_success));
                             moveToList();
                         } else {
-                            Snackbar.make(v, R.string.unable_to_process, Snackbar.LENGTH_LONG).show();
+                            alertPop.showAlertDialog(getResources().getString(R.string.unable_to_process));
                         }
                     }
                 } catch (Exception ex) {
@@ -144,6 +171,8 @@ public class AddSpentFragment extends Fragment implements IDatePicker {
             }
         });
         updateSpinnerData();
+        speechRecognitionLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+                this::handleSpeechRecognitionResult);
         return view;
     }
 
@@ -170,19 +199,20 @@ public class AddSpentFragment extends Fragment implements IDatePicker {
         dynamic_category_list.notifyDataSetChanged();
     }
 
-    public void getPickerDate(boolean isStartDate, int day, int month, int year){
+    public void getPickerDate(boolean isStartDate, int day, int month, int year) {
         month = month + 1;
         String monthName = String.valueOf(month);
         String dayName = String.valueOf(day);
-        if(month < 10){
+        if (month < 10) {
             monthName = "0" + monthName;
         }
-        if(day < 10){
+        if (day < 10) {
             dayName = "0" + dayName;
         }
         String setDate = dayName + "-" + monthName + "-" + year;
         spent_date.setText(setDate);
     }
+
     private void moveToList() {
 //        try {
 //            Thread.sleep(500);
@@ -196,4 +226,34 @@ public class AddSpentFragment extends Fragment implements IDatePicker {
 //            // Handle the exception if needed
 //        }
     }
+
+    private void handleMicClick() {
+        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
+        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak to text");
+
+        try {
+            speechRecognitionLauncher.launch(intent);
+        } catch (Exception e) {
+            // Handle any exceptions
+            e.printStackTrace();
+        }
+    }
+
+    private void handleSpeechRecognitionResult(ActivityResult result) {
+        if (result.getResultCode() == AppCompatActivity.RESULT_OK && result.getData() != null) {
+            ArrayList<String> matches = result.getData().getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+            if (matches != null && !matches.isEmpty()) {
+                String recognizedText = matches.get(0);
+                if (recognizedText != null && !recognizedText.isEmpty()) {
+                    SpeechParser speechParser = new SpeechParser(recognizedText);
+                    Map<String, String> results = new HashMap<>();
+
+                    results = speechParser.proccessUserVoiceText();
+                }
+            }
+        }
+    }
+
 }

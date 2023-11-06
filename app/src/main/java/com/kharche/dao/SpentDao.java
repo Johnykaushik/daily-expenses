@@ -38,9 +38,9 @@ public class SpentDao {
         values.put("amount", spent.getAmount());
         values.put("description", spent.getDescription());
         values.put("category_id", spent.getCategoryId().getId());
-        if( spent.getCreatedAt() != null && !spent.getCreatedAt().isEmpty()){
+        if (spent.getCreatedAt() != null && !spent.getCreatedAt().isEmpty()) {
             values.put("created_at", spent.getCreatedAt());
-        }else {
+        } else {
             values.put("created_at", utils.getCurTime());
         }
 
@@ -78,7 +78,7 @@ public class SpentDao {
                 spent.setCreatedAt(utils.formatDateTime(created_at));
             }
 
-            Log.d("TAG", "cursorToSpent: " + created_at + "  id " + spent_id) ;
+            Log.d("TAG", "cursorToSpent: " + created_at + "  id " + spent_id);
 
             if (category_id != null) {
                 if (!category_id.isEmpty() && category_id != "0") {
@@ -315,18 +315,25 @@ public class SpentDao {
         return spentList;
     }
 
-    public List<Map<String,Object>> getWeekMonthData(IDateMonthYearType group_by) {
+    public List<Map<String, Object>> getWeekMonthData(IDateMonthYearType group_by, int selectedCategoryId) {
         SQLiteDatabase db = databaseHelper.getReadableDatabase();
 
         String queryPart = " GROUP BY year, month, week ORDER BY year, month, week";
         if (group_by == IDateMonthYearType.DAY) {
-            queryPart = " GROUP BY year, month, day ORDER BY year, month, day desc";
+            queryPart = " GROUP BY year, month, day ORDER BY year, month, day";
         } else if (group_by == IDateMonthYearType.MONTH) {
             queryPart = " GROUP BY year, month ORDER BY  year, month";
         } else if (group_by == IDateMonthYearType.YEAR) {
             queryPart = " GROUP BY year ORDER BY year";
         }
-        List<Map<String,Object>> dataList = new ArrayList<>();
+        List<Map<String, Object>> dataList = new ArrayList<>();
+
+        String whereFilter = "";
+
+        if (selectedCategoryId > 0) {
+            whereFilter = " WHERE category_id=" + selectedCategoryId;
+        }
+
 
         String query = "SELECT strftime('%Y'," + TableName.SPENT_AMOUNT + ".created_at) AS year," +
                 " strftime('%m', strftime('%s'," + TableName.SPENT_AMOUNT + ".created_at),'UNIXEPOCH') AS month," +
@@ -334,8 +341,9 @@ public class SpentDao {
                 " strftime('%d'," + TableName.SPENT_AMOUNT + ".created_at) AS day," +
                 TableName.SPENT_AMOUNT + ".created_at AS date, " +
                 " SUM (" + TableName.SPENT_AMOUNT + ".amount) AS amount " +
-                " FROM " + TableName.SPENT_AMOUNT
-                 + queryPart;
+                " FROM " + TableName.SPENT_AMOUNT +
+                whereFilter +
+                queryPart;
 
         Log.d("TAG", "getWeekMonthData: query " + query);
 
@@ -357,12 +365,12 @@ public class SpentDao {
                     String date = cursor.getString(date_index);
                     Integer total = cursor.getInt(total_index);
 
-                    Map<String ,Object> singleData = new HashMap<>();
-                    singleData.put("year",year);
-                    singleData.put("month",month);
-                    singleData.put("week",week);
-                    singleData.put("day",day);
-                    singleData.put("amount",total);
+                    Map<String, Object> singleData = new HashMap<>();
+                    singleData.put("year", year);
+                    singleData.put("month", month);
+                    singleData.put("week", week);
+                    singleData.put("day", day);
+                    singleData.put("amount", total);
                     Log.d("TAG", group_by + " getWeekData: year " + year + " month " + month + " week " + week + " day " + day + " date " + date + " total " +
                             total);
 
@@ -374,5 +382,11 @@ public class SpentDao {
             }
         }
         return dataList;
+    }
+
+    public int deleteOne(int id){
+        SQLiteDatabase db = databaseHelper.getReadableDatabase();
+        String deleteId = String.valueOf(id);
+        return db.delete(TableName.SPENT_AMOUNT,"id=?",new String[]{deleteId});
     }
 }

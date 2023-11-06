@@ -6,17 +6,17 @@
     android:background="@drawable/card_bg">
 
     <LinearLayout
+        android:id="@+id/spent_category_wrapper"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:id="@+id/spent_category_wrapper"
         android:padding="5dp">
 
         <LinearLayout
             android:id="@+id/spent_wrapper"
             android:layout_width="0dp"
-            android:layout_weight="1"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:orientation="horizontal">
 
             <TextView
@@ -36,8 +36,8 @@
         <LinearLayout
             android:id="@+id/category_wrapper"
             android:layout_width="0dp"
-            android:layout_weight="1"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:orientation="horizontal"
 
             >
@@ -57,46 +57,68 @@
         </LinearLayout>
     </LinearLayout>
 
-    <LinearLayout
-        android:id="@+id/description_wrapper"
+    <RelativeLayout
+        android:id="@+id/spent_on_date_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/spent_category_wrapper"
-        android:orientation="horizontal"
-        android:padding="5dp">
+        android:layout_below="@+id/spent_category_wrapper">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/description"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/description"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingLeft="5dp"
-            android:text="-" />
-    </LinearLayout>
+            android:layout_marginRight="50dp"
+            android:orientation="vertical">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/description_wrapper"
-        android:orientation="horizontal"
-        android:padding="5dp">
+            <LinearLayout
+                android:id="@+id/description_wrapper"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="5dp">
 
-        <TextView
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/description"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/description"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="5dp"
+                    android:text="-" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="5dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/spent_date_time"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/date_time"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="5dp"
+                    android:text="-" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/spent_date_time"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/date_time"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingLeft="5dp"
-            android:text="-" />
-    </LinearLayout>
+            android:src="@drawable/delete_icon"
+            android:layout_alignParentEnd="true"
+            android:layout_gravity="end"
+            android:id="@+id/delete_spent"
+            android:layout_marginEnd="@dimen/common_padding_right"
+             />
+    </RelativeLayout>
 </RelativeLayout>

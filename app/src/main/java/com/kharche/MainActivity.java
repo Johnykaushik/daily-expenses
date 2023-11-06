@@ -3,6 +3,7 @@ package com.kharche;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
+
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
@@ -29,6 +30,7 @@ public class MainActivity extends AppCompatActivity implements IToolbarHeadingTi
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -45,6 +47,9 @@ public class MainActivity extends AppCompatActivity implements IToolbarHeadingTi
         getSupportActionBar().setTitle(title);
     }
 
+    public CharSequence getToolBarTitle(){
+        return getSupportActionBar().getTitle();
+    }
     private List<Category> getCategories() {
         List<Category> cateList = new ArrayList<>();
 
@@ -84,6 +89,9 @@ public class MainActivity extends AppCompatActivity implements IToolbarHeadingTi
             replaceAndRemoveFragments(new CategoryListFragment(this));
         } else if (itemId == R.id.export_db) {
             exportDB();
+        }else if (itemId == R.id.export_text_message){
+            TextMessages textMessages = new TextMessages(this);
+            textMessages.requestSmsPermission();
         } else {
             replaceAndRemoveFragments(new DashboardFragment(this));
         }
@@ -101,6 +109,7 @@ public class MainActivity extends AppCompatActivity implements IToolbarHeadingTi
     private void exportDB() {
         try {
             File dbFile = new File(this.getDatabasePath(DATABASE_NAME).getAbsolutePath());
+            Log.d("TAG", "exportDB:  exiting path  " + this.getDatabasePath(DATABASE_NAME).getAbsolutePath());
             if (dbFile.exists()) {
                 Calendar cal = Calendar.getInstance();
                 Date date = cal.getTime();

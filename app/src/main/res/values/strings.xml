@@ -24,7 +24,11 @@
     <string name="category_spent_associate">Category associated with Spent(s).</string>
 
     <string name="spent_amount_add_success">Spent added successfully.</string>
+    <string name="spent_amount_delete_ask">Do you really want to delete this spent?</string>
+    <string name="spent_amount_deleted_success">Spent deleted successfully.</string>
 
     <string name="category_exist">Category Already exist.</string>
     <string name="unable_to_process">Unable to process your request, please try again.</string>
+
+    <string name="data_not_found">Data not available.</string>
 </resources>

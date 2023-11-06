@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.graphics.Color;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
 import com.github.mikephil.charting.animation.Easing;
@@ -25,8 +26,10 @@ import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
+import com.kharche.dao.CategoryDao;
 import com.kharche.dao.SpentDao;
 import com.kharche.interfaces.IToolbarHeadingTitle;
+import com.kharche.model.Category;
 import com.kharche.model.Spent;
 import com.kharche.utils.DateFilterType;
 import com.kharche.utils.IDateMonthYearType;
@@ -45,9 +48,15 @@ public class DashboardFragment extends Fragment {
     private List<Spent> spentList;
     Calendar startDateUnix;
     Calendar endDateUnix;
+    private Spinner category_base;
 
     private Map<String, Object> whereFilter;
     private IToolbarHeadingTitle iToolbarHeadingTitle;
+    private ArrayAdapter<String> dynamic_category_list;
+    private HashMap<String, Integer> category_list;
+    private String selectedCategory;
+    private int selectedCategoryId;
+    private String selectedDatMonth;
 
     private LineChart lineChart;
 
@@ -72,54 +81,22 @@ public class DashboardFragment extends Fragment {
         whereFilter = new HashMap<>();
         spentDao = new SpentDao(requireContext());
 //
+        category_base = view.findViewById(R.id.dashboard_category_list);
+        dynamic_category_list = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item);
+        dynamic_category_list.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        category_base.setAdapter(dynamic_category_list);
+
         startDateUnix = Calendar.getInstance();
         endDateUnix = Calendar.getInstance();
-//        pieChart = view.findViewById(R.id.pieChart);
-
         lineChart = view.findViewById(R.id.getTheGraph);
-//        Spinner spentDateType = view.findViewById(R.id.spent_date_type);
-//
-//        // Date type dropdown
-//        spentDateType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-//            @Override
-//            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-//                String selectedValue = (String) parent.getItemAtPosition(position);
-//                DateFilterType selectedEnum = null;
-//                if (selectedValue != null) {
-//                    for (DateFilterType type : DateFilterType.values()) {
-//                        if (type.getValue().equalsIgnoreCase(selectedValue)) {
-//                            selectedEnum = type;
-//                            break;
-//                        }
-//                    }
-//                }
-//                setStartEndTime(selectedEnum);
-//            }
-//
-//            @Override
-//            public void onNothingSelected(AdapterView<?> parent) {
-//                System.out.println("select date type BB ");
-//            }
-//        });
-
-//        Button submitButton = view.findViewById(R.id.dashboard_submit);
-
-        // handle submit filter
-//        submitButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                List<Spent> spentList = spentDao.spentCategoryDashboard(startDateUnix,endDateUnix);
-//                generateChart(spentList);
-//            }
-//        });
-
         Spinner date_type_filter = view.findViewById(R.id.date_type_filter);
 
         date_type_filter.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 String selectedValue = (String) parent.getItemAtPosition(position);
-                getSelectedItem(selectedValue);
+                selectedDatMonth = selectedValue;
+                getSelectedItem(selectedValue,selectedCategoryId);
             }
 
             @Override
@@ -128,46 +105,102 @@ public class DashboardFragment extends Fragment {
             }
         });
 
+        category_base.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                String selectedValue = (String) parentView.getItemAtPosition(position);
+                selectedCategory = "";
+                String regex = "\\(\\d+\\)";
+                if (!selectedValue.isEmpty()) {
+                    selectedValue = selectedValue.replaceAll(regex, "");
+                }
+                if(position > 0 ){ // at position 0 it is place hold to select category, so ignore this
+                    selectedCategory = selectedValue;
+                }
+
+                if (!selectedCategory.isEmpty()) {
+                    if (category_list.get(selectedCategory) != null) {
+                       selectedCategoryId = category_list.get(selectedCategory);
+                    }
+                }
+                getSelectedItem(selectedDatMonth,selectedCategoryId);
+
+                System.out.println("Selected category " + selectedCategory + " selectedCategoryId : " + selectedCategoryId);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView) {
+                // Handle nothing selected if needed
+            }
+        });
+
+
+        updateSpinnerData();
 
         return view;
+    }
+    private void updateSpinnerData() {
+        category_list = new HashMap<>();
+        ArrayAdapter<String> existingCate = (ArrayAdapter<String>) category_base.getAdapter();
+
+        for (int i = 0; i < existingCate.getCount(); i++) {
+            dynamic_category_list.add(existingCate.getItem(i));
+        }
+
+        String selectCategory = getResources().getString(R.string.price_category_title);
+        dynamic_category_list.add(selectCategory);
+
+        CategoryDao categoryDao = new CategoryDao(requireContext());
+        List<Category> categories = categoryDao.getAllCategories(false);
+        for (Category category : categories) {
+            int categoryId = category.getId();
+            String categoryName = category.getCategoryName();
+            category_list.put(categoryName, categoryId);
+            dynamic_category_list.add(categoryName);
+        }
+        dynamic_category_list.notifyDataSetChanged();
     }
 
     public IDateMonthYearType parseDateFilter(String val) {
         try {
-            val = val.toUpperCase();
-            IDateMonthYearType type = IDateMonthYearType.valueOf(val);
-            Log.d("TAG", "parseDateFilter: " + type + " val " + val);
-            return type;
+            if(val != null){
+                val = val.toUpperCase();
+                IDateMonthYearType type = IDateMonthYearType.valueOf(val);
+                Log.d("TAG", "parseDateFilter: " + type + " val " + val);
+                return type;
+            }else {
+                return null;
+            }
         } catch (IllegalArgumentException e) {
             return null;
         }
     }
 
-    private void getSelectedItem(String val) {
+    private void getSelectedItem(String val, int selectedCategoryId) {
         List<Map<String, Object>> dataList = new ArrayList<>();
         IDateMonthYearType type = parseDateFilter(val);
         Log.d("TAG", "getSelectedItem: " + type + " val " + val + "  >> " + IDateMonthYearType.DAY);
-        spentDao.getWeekMonthData(IDateMonthYearType.DAY);
+
         if (type != null) {
             switch (type) {
                 case DAY:
                     Log.d("TAG", "Selected is : day");
-                    dataList = spentDao.getWeekMonthData(IDateMonthYearType.DAY);
+                    dataList = spentDao.getWeekMonthData(IDateMonthYearType.DAY,selectedCategoryId);
                     break;
                 case WEEK:
                     Log.d("TAG", "Selected is : week");
 
-                    dataList = spentDao.getWeekMonthData(IDateMonthYearType.WEEK);
+                    dataList = spentDao.getWeekMonthData(IDateMonthYearType.WEEK,selectedCategoryId);
                     break;
                 case MONTH:
                     Log.d("TAG", "Selected is : month");
 
-                    dataList = spentDao.getWeekMonthData(IDateMonthYearType.MONTH);
+                    dataList = spentDao.getWeekMonthData(IDateMonthYearType.MONTH,selectedCategoryId);
                     break;
                 case YEAR:
                     Log.d("TAG", "Selected is : year");
 
-                    dataList = spentDao.getWeekMonthData(IDateMonthYearType.YEAR);
+                    dataList = spentDao.getWeekMonthData(IDateMonthYearType.YEAR,selectedCategoryId);
                     break;
             }
         }

@@ -8,7 +8,6 @@
     android:paddingLeft="@dimen/common_margin_left"
     android:paddingRight="@dimen/common_margin_right"
     tools:context=".AddSpentFragment">
-
     <EditText
         android:id="@+id/spent_amount"
         android:layout_width="match_parent"
@@ -43,6 +42,13 @@
         android:entries="@array/price_category"
         android:prompt="@string/price_category_title" />
 
+    <ImageView
+        android:layout_width="81dp"
+        android:layout_height="76dp"
+        android:layout_marginTop="@dimen/common_margin_top"
+        android:src="@drawable/baseline_mic_24"
+        android:id="@+id/microphone"
+        />
     <Button
         android:id="@+id/submit_btn"
         android:layout_width="wrap_content"

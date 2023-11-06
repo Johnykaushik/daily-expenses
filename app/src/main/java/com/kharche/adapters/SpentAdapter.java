@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.kharche.interfaces.OnItemClickListener;
 import com.kharche.model.Spent;
 import com.kharche.views.CategoryViewHolder;
 import com.kharche.R;
@@ -19,10 +20,12 @@ import java.util.List;
 public class SpentAdapter extends RecyclerView.Adapter<SpentViewHolder> {
 
     List<Spent> spentList = Collections.emptyList();
+    OnItemClickListener onItemClickListener;
 
-    public SpentAdapter(List<Spent> spentList) {
+    public SpentAdapter(List<Spent> spentList, OnItemClickListener onItemClickListener) {
 
         this.spentList = spentList;
+        this.onItemClickListener = onItemClickListener;
     }
 
     @Override
@@ -45,6 +48,13 @@ public class SpentAdapter extends RecyclerView.Adapter<SpentViewHolder> {
         spentViewHolder.getCategoryName().setText(category);
         spentViewHolder.getDescription().setText(spentList.get(position).description);
         spentViewHolder.getDateTime().setText(spentList.get(position).createdAt);
+
+        spentViewHolder.getDeleteSpent().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onItemClickListener.onItemClick(position);
+            }
+        });
     }
 
     @Override

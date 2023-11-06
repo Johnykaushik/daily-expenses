@@ -120,7 +120,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/date_filter_container"
                 android:layout_marginTop="20dp"
-                android:paddingRight="10dp">
+                android:paddingRight="@dimen/common_padding_right" >
 
                 <LinearLayout
                     android:layout_width="wrap_content"
@@ -164,4 +164,12 @@
         android:paddingLeft="10dp"
         android:paddingTop="10dp"
         android:paddingRight="10dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/data_not_found"
+        android:layout_marginLeft="@dimen/common_padding_left"
+        android:id="@+id/data_not_available"
+        />
 </LinearLayout>
