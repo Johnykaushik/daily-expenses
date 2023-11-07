@@ -1,7 +1,5 @@
 package com.kharche.model;
 
-import java.util.Date;
-
 public class Spent {
 
     public int id;

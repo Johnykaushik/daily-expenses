@@ -1,7 +1,6 @@
 package com.kharche;
 
 import android.content.Intent;
-import android.media.Image;
 import android.os.Bundle;
 
 import androidx.activity.result.ActivityResult;
@@ -21,9 +20,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
-import android.widget.Toast;
 
-import com.google.android.material.snackbar.Snackbar;
 import com.kharche.dao.CategoryDao;
 import com.kharche.dao.SpentDao;
 import com.kharche.helpers.DatePickerHelper;

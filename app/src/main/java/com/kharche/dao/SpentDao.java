@@ -13,15 +13,10 @@ import com.kharche.model.Category;
 import com.kharche.model.Spent;
 import com.kharche.utils.IDateMonthYearType;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 public class SpentDao {

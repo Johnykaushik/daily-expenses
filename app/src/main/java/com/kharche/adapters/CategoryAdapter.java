@@ -7,7 +7,6 @@ import android.view.ViewGroup;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.kharche.interfaces.OnItemClickListener;
-import com.kharche.model.Spent;
 import com.kharche.views.CategoryViewHolder;
 import com.kharche.R;
 import com.kharche.model.Category;

@@ -1,6 +1,5 @@
 package com.kharche.adapters;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,9 +8,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.kharche.interfaces.OnItemClickListener;
 import com.kharche.model.Spent;
-import com.kharche.views.CategoryViewHolder;
 import com.kharche.R;
-import com.kharche.model.Category;
 import com.kharche.views.SpentViewHolder;
 
 import java.util.Collections;

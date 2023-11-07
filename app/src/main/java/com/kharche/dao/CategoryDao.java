@@ -58,14 +58,10 @@ public class CategoryDao {
     public List<Category> getAllCategories(boolean maxByAssociated) {
         List<Category> categories = new ArrayList<>();
         SQLiteDatabase db = databaseHelper.getReadableDatabase();
-
-
-    String sortBy = maxByAssociated ? "associated_spent" : "id";
+        String sortBy = maxByAssociated ? "associated_spent" : "id";
         String query = "SELECT  (SELECT COUNT(*) FROM " + TableName.SPENT_AMOUNT + " WHERE " + TableName.SPENT_AMOUNT + ".category_id = " + TableName.CATEGORY + ".id) as associated_spent, id, category FROM  " + TableName.CATEGORY + " order by " + sortBy + " desc";
 
         Cursor cursor = db.rawQuery(query, null);
-
-        System.out.println("queryquery " + query);
         if (cursor != null) {
             while (cursor.moveToNext()) {
                 try {

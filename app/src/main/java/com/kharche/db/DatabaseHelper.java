@@ -1,16 +1,9 @@
 package com.kharche.db;
 
 import android.content.Context;
-import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.os.Environment;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.channels.FileChannel;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = TableName.DATABASE_NAME;
@@ -18,6 +11,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+    }
+
+    public DatabaseHelper(Context context,  String externalDatabasePath) {
+        super(context, externalDatabasePath, null, DATABASE_VERSION);
     }
 
     @Override
@@ -30,5 +27,27 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // Handle database schema upgrades here
         // Typically, you would drop the existing tables and recreate them
+
+    }
+
+    public boolean attachExternalDatabase(String externalDatabasePath, String alias) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // Attach the external database with the specified alias
+        String attachSql = "ATTACH DATABASE ? AS " + alias;
+        try {
+            db.execSQL(attachSql, new String[]{externalDatabasePath});
+            return true; // Attachment was successful
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false; // Attachment failed
+        }
+    }
+
+    public void detachExternalDatabase(String alias) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        // Detach the external database using the alias
+        String detachSql = "DETACH DATABASE " + alias;
+        db.execSQL(detachSql);
     }
 }

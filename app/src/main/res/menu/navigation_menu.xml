@@ -27,8 +27,13 @@
         android:id="@+id/export_db"
         android:title="@string/export_db"
         />
+<!--    <item-->
+<!--        android:id="@+id/export_text_message"-->
+<!--        android:title="Export Text Message"-->
+<!--        />-->
     <item
-        android:id="@+id/export_text_message"
-        android:title="Export Text Message"
-        />
+        android:id="@+id/import_db"
+        android:title="Import Storage(.db)"
+    />
+
 </menu>

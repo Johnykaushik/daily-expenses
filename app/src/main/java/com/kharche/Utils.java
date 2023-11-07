@@ -2,20 +2,17 @@ package com.kharche;
 
 
 import android.content.Context;
-import android.util.Log;
 import android.widget.ArrayAdapter;
 
 import com.kharche.dao.CategoryDao;
 import com.kharche.model.Category;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.TimeZone;
 
 public class Utils {

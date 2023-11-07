@@ -1,6 +1,5 @@
 package com.kharche;
 
-import android.content.Context;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;

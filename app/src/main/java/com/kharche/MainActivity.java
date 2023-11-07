@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
@@ -12,6 +13,7 @@ import android.view.MenuItem;
 
 import com.kharche.dao.CategoryDao;
 import com.kharche.db.TableName;
+import com.kharche.helpers.FileUploadHelper;
 import com.kharche.interfaces.IToolbarHeadingTitle;
 import com.kharche.model.Category;
 import com.kharche.utils.AlertPop;
@@ -25,8 +27,7 @@ import java.util.Date;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements IToolbarHeadingTitle {
-    String DATABASE_NAME =  TableName.DATABASE_NAME;
-
+    String DATABASE_NAME = TableName.DATABASE_NAME;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -35,7 +36,7 @@ public class MainActivity extends AppCompatActivity implements IToolbarHeadingTi
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         if (savedInstanceState == null) {
-            replaceAndRemoveFragments(new DashboardFragment(this));
+            replaceAndRemoveFragments(new AddSpentFragment(this));
         }
     }
 
@@ -47,9 +48,10 @@ public class MainActivity extends AppCompatActivity implements IToolbarHeadingTi
         getSupportActionBar().setTitle(title);
     }
 
-    public CharSequence getToolBarTitle(){
+    public CharSequence getToolBarTitle() {
         return getSupportActionBar().getTitle();
     }
+
     private List<Category> getCategories() {
         List<Category> cateList = new ArrayList<>();
 
@@ -89,9 +91,14 @@ public class MainActivity extends AppCompatActivity implements IToolbarHeadingTi
             replaceAndRemoveFragments(new CategoryListFragment(this));
         } else if (itemId == R.id.export_db) {
             exportDB();
-        }else if (itemId == R.id.export_text_message){
-            TextMessages textMessages = new TextMessages(this);
-            textMessages.requestSmsPermission();
+        }
+
+//        else if (itemId == R.id.export_text_message){
+//            TextMessages textMessages = new TextMessages(this);
+//            textMessages.requestSmsPermission();
+//        }
+        else if (itemId == R.id.import_db) {
+            replaceAndRemoveFragments(new ImportStorageFragment(this));
         } else {
             replaceAndRemoveFragments(new DashboardFragment(this));
         }
@@ -115,7 +122,7 @@ public class MainActivity extends AppCompatActivity implements IToolbarHeadingTi
                 Date date = cal.getTime();
                 String fileName = "kharcha-" + cal.getTimeInMillis() + ".db";
                 Log.d("TAG", "exportDB: file name " + fileName);
-                File outFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),  fileName);
+                File outFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), fileName);
                 // Perform the file copy
                 FileInputStream inputStream = new FileInputStream(dbFile);
                 FileOutputStream outputStream = new FileOutputStream(outFile);
@@ -138,6 +145,12 @@ public class MainActivity extends AppCompatActivity implements IToolbarHeadingTi
         } catch (Exception e) {
             Log.e("TAG", "exportDB: " + e.getMessage());
         }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        FileUploadHelper.getInstance().onActivityResult(requestCode, resultCode, data, this);
     }
 
 }
