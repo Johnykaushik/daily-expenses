@@ -6,8 +6,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
-import com.kharche.db.TableName;
 import com.kharche.db.DatabaseHelper;
+import com.kharche.db.TableName;
 import com.kharche.model.Category;
 import com.kharche.model.Spent;
 
@@ -17,8 +17,8 @@ import java.util.List;
 import java.util.Map;
 
 public class CategoryDao {
-    private DatabaseHelper databaseHelper;
-    private Context context;
+    private final DatabaseHelper databaseHelper;
+    private final Context context;
 
     public CategoryDao(Context context) {
         // Initialize MyDatabaseHelper with the provided context
@@ -58,8 +58,22 @@ public class CategoryDao {
     public List<Category> getAllCategories(boolean maxByAssociated) {
         List<Category> categories = new ArrayList<>();
         SQLiteDatabase db = databaseHelper.getReadableDatabase();
-        String sortBy = maxByAssociated ? "associated_spent" : "id";
-        String query = "SELECT  (SELECT COUNT(*) FROM " + TableName.SPENT_AMOUNT + " WHERE " + TableName.SPENT_AMOUNT + ".category_id = " + TableName.CATEGORY + ".id) as associated_spent, id, category FROM  " + TableName.CATEGORY + " order by " + sortBy + " desc";
+        String sortBy = maxByAssociated ? "spent_amount" : "associated_spent";
+        String query = "SELECT"
+                + " (SELECT COUNT(*) FROM "
+                + TableName.SPENT_AMOUNT
+                + " WHERE "
+                + TableName.SPENT_AMOUNT
+                + ".category_id = "
+                + TableName.CATEGORY + ".id) as associated_spent,"
+                + " (SELECT SUM(amount) FROM "
+                + TableName.SPENT_AMOUNT
+                + " WHERE "
+                + TableName.SPENT_AMOUNT
+                + ".category_id = "
+                + TableName.CATEGORY + ".id) as spent_amount, "
+                + " id, category FROM  " + TableName.CATEGORY
+                + " order by " + sortBy + " desc";
 
         Cursor cursor = db.rawQuery(query, null);
         if (cursor != null) {
@@ -77,6 +91,7 @@ public class CategoryDao {
                         if (associated_spent_index != -1) {
                             String associatedSpent = cursor.getString(associated_spent_index);
                             categoryBase.setAssociatedSpent(Integer.valueOf(associatedSpent));
+                            categoryBase.setSpentAmount(cursor.getInt(cursor.getColumnIndexOrThrow("spent_amount")));
                         }
                         categories.add(categoryBase);
                     }

@@ -93,9 +93,8 @@ public class SpentDao {
 
     public List<Spent> getAllSpents(Map<String, Object> queryParam) {
         List<Spent> spents = new ArrayList<>();
-        String sortBy = "id";
+        String sortBy = "created_at";
         try {
-
             SQLiteDatabase db = databaseHelper.getReadableDatabase();
 //            String tableName = TableName.SPENT_AMOUNT;
 //            String query1 = "PRAGMA table_info(" + tableName + ");";
@@ -356,7 +355,7 @@ public class SpentDao {
                     Integer year = cursor.getInt(year_index);
                     String month = cursor.getString(month_index);
                     String week = cursor.getString(week_index);
-                    Integer day = cursor.getInt(day_index);
+                    String day = cursor.getString(day_index);
                     String date = cursor.getString(date_index);
                     Integer total = cursor.getInt(total_index);
 

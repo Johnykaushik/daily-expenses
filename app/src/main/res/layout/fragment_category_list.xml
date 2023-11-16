@@ -19,7 +19,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Used on Top"
+            android:text="Price on Top"
             android:id="@+id/used_on_top_sort" />
 
         <Switch

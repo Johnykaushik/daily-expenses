@@ -174,4 +174,7 @@ public class Utils {
         return  calendar;
     }
 
+    public String parseBelowTen(int number){
+        return  number < 10 ? "0" + number : String.valueOf(number);
+    }
 }

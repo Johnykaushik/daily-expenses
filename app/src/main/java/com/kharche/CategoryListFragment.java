@@ -99,6 +99,7 @@ public class CategoryListFragment extends Fragment implements OnItemClickListene
             setCat.setId(categoryId);
             setCat.setCategoryName(categoryName);
             setCat.setAssociatedSpent(category.getAssociatedSpent());
+            setCat.setSpentAmount(category.getSpentAmount());
             cateList.add(setCat);
         }
         return cateList;

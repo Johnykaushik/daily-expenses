@@ -35,11 +35,12 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryViewHolder> {
     public void onBindViewHolder(final CategoryViewHolder categoryViewHolder, final int position){
         final int index = categoryViewHolder.getBindingAdapterPosition();
         String setCat = (index +1) +"). "+   categoryList.get(position).categoryName;
-    System.out.println("categoryList.get(position).associatedSpent " + categoryList.get(position).associatedSpent);
         if(categoryList.get(position).associatedSpent > 0){
            setCat += "(" + categoryList.get(position).associatedSpent  +  ")";
         }
-        System.out.println("categoryList.get(position) " + categoryList.get(position).toString() + " setCat " + setCat);
+        if(categoryList.get(position).spentAmount > 0){
+            setCat += " ₹" + categoryList.get(position).spentAmount;
+        }
         categoryViewHolder.getCategoryVName().setText(setCat);
 
         categoryViewHolder.getDeleteCategory().setOnClickListener(new View.OnClickListener() {

@@ -89,7 +89,7 @@ public class DashboardFragment extends Fragment {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 String selectedValue = (String) parent.getItemAtPosition(position);
                 selectedDatMonth = selectedValue;
-                getSelectedItem(selectedValue,selectedCategoryId);
+                getSelectedItem(selectedValue, selectedCategoryId);
             }
 
             @Override
@@ -107,16 +107,16 @@ public class DashboardFragment extends Fragment {
                 if (!selectedValue.isEmpty()) {
                     selectedValue = selectedValue.replaceAll(regex, "");
                 }
-                if(position > 0 ){ // at position 0 it is place hold to select category, so ignore this
+                if (position > 0) { // at position 0 it is place hold to select category, so ignore this
                     selectedCategory = selectedValue;
                 }
 
                 if (!selectedCategory.isEmpty()) {
                     if (category_list.get(selectedCategory) != null) {
-                       selectedCategoryId = category_list.get(selectedCategory);
+                        selectedCategoryId = category_list.get(selectedCategory);
                     }
                 }
-                getSelectedItem(selectedDatMonth,selectedCategoryId);
+                getSelectedItem(selectedDatMonth, selectedCategoryId);
 
                 System.out.println("Selected category " + selectedCategory + " selectedCategoryId : " + selectedCategoryId);
             }
@@ -132,6 +132,7 @@ public class DashboardFragment extends Fragment {
 
         return view;
     }
+
     private void updateSpinnerData() {
         category_list = new HashMap<>();
         ArrayAdapter<String> existingCate = (ArrayAdapter<String>) category_base.getAdapter();
@@ -156,12 +157,12 @@ public class DashboardFragment extends Fragment {
 
     public IDateMonthYearType parseDateFilter(String val) {
         try {
-            if(val != null){
+            if (val != null) {
                 val = val.toUpperCase();
                 IDateMonthYearType type = IDateMonthYearType.valueOf(val);
                 Log.d("TAG", "parseDateFilter: " + type + " val " + val);
                 return type;
-            }else {
+            } else {
                 return null;
             }
         } catch (IllegalArgumentException e) {
@@ -178,22 +179,22 @@ public class DashboardFragment extends Fragment {
             switch (type) {
                 case DAY:
                     Log.d("TAG", "Selected is : day");
-                    dataList = spentDao.getWeekMonthData(IDateMonthYearType.DAY,selectedCategoryId);
+                    dataList = spentDao.getWeekMonthData(IDateMonthYearType.DAY, selectedCategoryId);
                     break;
                 case WEEK:
                     Log.d("TAG", "Selected is : week");
 
-                    dataList = spentDao.getWeekMonthData(IDateMonthYearType.WEEK,selectedCategoryId);
+                    dataList = spentDao.getWeekMonthData(IDateMonthYearType.WEEK, selectedCategoryId);
                     break;
                 case MONTH:
                     Log.d("TAG", "Selected is : month");
 
-                    dataList = spentDao.getWeekMonthData(IDateMonthYearType.MONTH,selectedCategoryId);
+                    dataList = spentDao.getWeekMonthData(IDateMonthYearType.MONTH, selectedCategoryId);
                     break;
                 case YEAR:
                     Log.d("TAG", "Selected is : year");
 
-                    dataList = spentDao.getWeekMonthData(IDateMonthYearType.YEAR,selectedCategoryId);
+                    dataList = spentDao.getWeekMonthData(IDateMonthYearType.YEAR, selectedCategoryId);
                     break;
             }
         }
@@ -202,68 +203,71 @@ public class DashboardFragment extends Fragment {
 
         generateLineChart(dataList, type);
     }
-//
+
+    //
     public void generateLineChart(List<Map<String, Object>> dataList, IDateMonthYearType type) {
 
         ArrayList<Entry> entries = new ArrayList<>();
         List<String> labelList = new ArrayList<>();
-    try {
-        String[] monthName = new String[]{"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sept", "Oct", "Nov", "Dec"};
-        String[] weekName = new String[]{"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
-        int it = 0;
-        for (Map<String, Object> data : dataList) {
-            Log.d("TAG", "generateLineChart: " + data.toString());
-            float value = Float.valueOf(data.get("amount").toString());
-            int day = (int)data.get("day");
-            int week = Integer.valueOf(data.get("week").toString());
-            int month = Integer.valueOf(data.get("month").toString());
-            int year = (int) data.get("year");
-            if (year > 0) {
+        try {
+            String[] monthName = new String[]{"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sept", "Oct", "Nov", "Dec"};
+            String[] weekName = new String[]{"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
+            int it = 0;
+            for (Map<String, Object> data : dataList) {
+                Log.d("TAG", "generateLineChart: " + data.toString());
+                float value = Float.valueOf(data.get("amount").toString());
+//            int day = (int)data.get("day");
+                String day = data.get("day").toString();
+                int week = Integer.valueOf(data.get("week").toString());
+                int month = Integer.valueOf(data.get("month").toString());
+                int year = (int) data.get("year");
+                if (year > 0) {
 
-                Log.d("TAG", "generateLineChart: " + value + " day: " + day + " week: " + week + " month: " + month + " year: " + year);
-                entries.add(new Entry(it, value));
-                String label = "";
-                if (type == IDateMonthYearType.DAY) {
-                    String day_s = day < 10 ? ("0" + day) : "" + day;
-                    String month_s = month < 10 ? ("0" + month) : "" + month;
-                    label = day_s + "-" + month_s + "-" + year;
-                } else if (type == IDateMonthYearType.WEEK) {
-                    label = (week == 0 ? "1" : week) + " " + type + " " + year;
-                } else if (type == IDateMonthYearType.MONTH) {
-                    label = monthName[month - 1] + "-" + year + "(" + ((int) value) + ")";
-                } else if (type == IDateMonthYearType.YEAR) {
-                    label = year + "(" + ((int) value) + ")";
+                    Log.d("TAG", "generateLineChart: " + value + " day: " + day + " week: " + week + " month: " + month + " year: " + year);
+                    entries.add(new Entry(it, value));
+                    String label = "";
+                    if (type == IDateMonthYearType.DAY) {
+//                    String day_s = day < 10 ? ("0" + day) : "" + day;
+                        String day_s = day;
+                        String month_s = month < 10 ? ("0" + month) : "" + month;
+                        label = day_s + "-" + month_s + "-" + year;
+                    } else if (type == IDateMonthYearType.WEEK) {
+                        label = (week == 0 ? "1" : week) + " " + type + " " + year;
+                    } else if (type == IDateMonthYearType.MONTH) {
+                        label = monthName[month - 1] + "-" + year + "(" + ((int) value) + ")";
+                    } else if (type == IDateMonthYearType.YEAR) {
+                        label = year + "(" + ((int) value) + ")";
+                    }
+                    labelList.add(label);
+                    it++;
+
                 }
-                labelList.add(label);
-                it++;
-
             }
+
+            XAxis xAxis = lineChart.getXAxis();
+            xAxis.setValueFormatter(new IndexAxisValueFormatter(labelList));
+
+
+            xAxis.setGranularity(1f);
+            xAxis.setLabelRotationAngle(45);
+
+
+            Log.d("TAG", "generateLineChart: " + entries.size());
+            LineDataSet dataSet = new LineDataSet(entries, "Price");
+            dataSet.setColor(Color.BLUE);
+            dataSet.setValueTextSize(12f);
+
+            LineData lineData = new LineData(dataSet);
+            lineChart.setData(lineData);
+
+            lineChart.getDescription().setEnabled(false);
+            lineChart.setDragEnabled(true);
+            lineChart.setScaleEnabled(true);
+            lineChart.invalidate();
+
+        } catch (Exception ex) {
+            Log.d("TAG", "generateLineChart: EE  " + ex.getMessage());
         }
-
-        XAxis xAxis = lineChart.getXAxis();
-        xAxis.setValueFormatter(new IndexAxisValueFormatter(labelList));
-
-
-        xAxis.setGranularity(1f);
-        xAxis.setLabelRotationAngle(45);
-
-
-        Log.d("TAG", "generateLineChart: " + entries.size());
-        LineDataSet dataSet = new LineDataSet(entries, "Price");
-        dataSet.setColor(Color.BLUE);
-        dataSet.setValueTextSize(12f);
-
-        LineData lineData = new LineData(dataSet);
-        lineChart.setData(lineData);
-
-        lineChart.getDescription().setEnabled(false);
-        lineChart.setDragEnabled(true);
-        lineChart.setScaleEnabled(true);
-        lineChart.invalidate();
-
-    }catch(Exception ex){
-        Log.d("TAG", "generateLineChart: EE  " + ex.getMessage());
-    }
 
     }
 

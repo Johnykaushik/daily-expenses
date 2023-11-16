@@ -5,6 +5,10 @@ public class Category {
     public String categoryName;
     public int associatedSpent;
 
+
+
+    public int spentAmount;
+
     @Override
     public String toString() {
         return "Category{" +
@@ -37,5 +41,12 @@ public class Category {
 
     public void setAssociatedSpent(int associatedSpent) {
         this.associatedSpent = associatedSpent;
+    }
+    public int getSpentAmount() {
+        return spentAmount;
+    }
+
+    public void setSpentAmount(int spentAmount) {
+        this.spentAmount = spentAmount;
     }
 }

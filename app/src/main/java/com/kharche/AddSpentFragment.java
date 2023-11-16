@@ -24,7 +24,9 @@ import android.widget.Spinner;
 import com.kharche.dao.CategoryDao;
 import com.kharche.dao.SpentDao;
 import com.kharche.helpers.DatePickerHelper;
+import com.kharche.helpers.TimePickerHelper;
 import com.kharche.interfaces.IDatePicker;
+import com.kharche.interfaces.ITimePicker;
 import com.kharche.interfaces.IToolbarHeadingTitle;
 import com.kharche.model.Category;
 import com.kharche.model.Spent;
@@ -32,6 +34,7 @@ import com.kharche.utils.AlertPop;
 import com.kharche.utils.SpeechParser;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -41,7 +44,7 @@ import java.util.Map;
  * A simple {@link Fragment} subclass.
  * create an instance of this fragment.
  */
-public class AddSpentFragment extends Fragment implements IDatePicker {
+public class AddSpentFragment extends Fragment implements IDatePicker, ITimePicker {
     private Spinner category_base;
     private ArrayAdapter<String> dynamic_category_list;
     private HashMap<String, Integer> category_list;
@@ -49,7 +52,9 @@ public class AddSpentFragment extends Fragment implements IDatePicker {
     EditText spent_date;
     private IToolbarHeadingTitle iToolbarHeadingTitle;
     DatePickerHelper datePickerHelper;
+    TimePickerHelper timePickerHelper;
     private ActivityResultLauncher<Intent> speechRecognitionLauncher;
+    Utils utils;
 
 
     public AddSpentFragment(IToolbarHeadingTitle iToolbarHeadingTitle) {
@@ -63,6 +68,7 @@ public class AddSpentFragment extends Fragment implements IDatePicker {
         iToolbarHeadingTitle.setToolBarTitle(R.string.add_spent);
 
         datePickerHelper = new DatePickerHelper(requireContext(), this);
+        timePickerHelper = new TimePickerHelper(requireContext(), this);
 
         category_base = view.findViewById(R.id.price_category);
         dynamic_category_list = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item);
@@ -73,6 +79,8 @@ public class AddSpentFragment extends Fragment implements IDatePicker {
         EditText spent_on = view.findViewById(R.id.spent_on);
         Button submit_btn = view.findViewById(R.id.submit_btn);
         spent_date = view.findViewById(R.id.spent_date);
+
+        utils = new Utils();
 
         // select category from options list
         category_base.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -103,6 +111,8 @@ public class AddSpentFragment extends Fragment implements IDatePicker {
 
         // handle microphone click
         ImageView microphone = view.findViewById(R.id.microphone);
+
+        microphone.setVisibility(View.GONE);
 
         microphone.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -139,7 +149,39 @@ public class AddSpentFragment extends Fragment implements IDatePicker {
                         if (date != null && !date.isEmpty()) {
                             String[] dateSpl = date.split("-");
                             if (dateSpl.length == 3) {
-                                spent.setCreatedAt(dateSpl[2] + "-" + dateSpl[1] + "-" + dateSpl[0] + " 00:00:00");
+                                String yearStr = dateSpl[2];
+                                String year = "0000";
+                                int month = Integer.valueOf(dateSpl[1]);
+                                int day = Integer.valueOf(dateSpl[0]);
+                                int hour = 0;
+                                int min = 0;
+                                String sec = "00";
+                                if (dateSpl[2].contains(":")) {
+
+                                    String[] yearTime = dateSpl[2].split("");
+
+                                    year = String.join("", Arrays.copyOfRange(yearTime, 0, 4));
+                                    if (year != null && year.length() == 4) {
+                                        yearStr = yearStr.replace(year, "");
+                                    }
+
+                                    String[] hourMinType = yearStr.trim().split(" "); // 10:10 AM like this
+
+
+                                    if (hourMinType.length == 2) {
+                                        String[] hourMin = hourMinType[0].split(":");
+                                        hour = Integer.valueOf(hourMin[0]);
+                                        min = Integer.valueOf(hourMin[1]);
+
+                                        String timeType = hourMinType[1].toString();
+                                        if (timeType.equals("PM")) {
+                                            hour = hour + 12;
+                                        }
+                                    }
+                                } else {
+                                    year = yearStr;
+                                }
+                                spent.setCreatedAt(year + "-" + month + "-" + day + " " + utils.parseBelowTen(hour) + ":" + utils.parseBelowTen(min) + ":" + sec);
                             }
                         }
 
@@ -156,6 +198,7 @@ public class AddSpentFragment extends Fragment implements IDatePicker {
                         if (isAdded > 0) {
                             spent_amount.setText("");
                             spent_on.setText("");
+                            spent_date.setText("");
                             alertPop.showAlertDialog(getResources().getString(R.string.spent_amount_add_success));
                             moveToList();
                         } else {
@@ -198,16 +241,28 @@ public class AddSpentFragment extends Fragment implements IDatePicker {
 
     public void getPickerDate(boolean isStartDate, int day, int month, int year) {
         month = month + 1;
-        String monthName = String.valueOf(month);
-        String dayName = String.valueOf(day);
-        if (month < 10) {
-            monthName = "0" + monthName;
-        }
-        if (day < 10) {
-            dayName = "0" + dayName;
-        }
+        String monthName = utils.parseBelowTen(month);
+        String dayName = utils.parseBelowTen(day);
+
         String setDate = dayName + "-" + monthName + "-" + year;
         spent_date.setText(setDate);
+        timePickerHelper.showTimePicker();
+    }
+
+    public void getPickerTime(int hourOfDay, int minute) {
+        String existingDate = spent_date.getText().toString();
+
+        String amPm = "AM";
+
+        int parsedHour = hourOfDay;
+
+        if (hourOfDay >= 13) {
+            parsedHour = hourOfDay % 12;
+            amPm = "PM";
+        }
+        spent_date.setText(existingDate + " " + (parsedHour < 10 ? ("0" + parsedHour) : parsedHour)
+                + ":" +
+                (minute < 10 ? ("0" + minute) : minute) + " " + amPm);
     }
 
     private void moveToList() {
